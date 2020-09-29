@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 
-public class NumberGuesserPart4 {
+public class NumberGuesserHW {
 	private int level = 1;
 	private int strikes = 0;
 	private int maxStrikes = 5;
 	private int number = 0;
+	private int guesses[];
 	private boolean isRunning = false;
 	final String saveFile = "numberGuesserSave.txt";
 
@@ -19,6 +20,14 @@ public class NumberGuesserPart4 {
 	 * @param level (level to use as upper bounds)
 	 * @return number between bounds
 	 */
+	public static String getPlayerName(String playerName) {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Please enter your name:");
+		String player = scan.nextLine();
+		playerName = player;
+
+	}
+
 	public static int getNumber(int level) {
 		int range = 9 + ((level - 1) * 5);
 		System.out.println("I picked a random number between 1-" + (range + 1) + ", let's see if you can guess.");
@@ -29,6 +38,9 @@ public class NumberGuesserPart4 {
 		System.out.println("That's right!");
 		level++;// level up!
 		saveLevel();
+		saveStrikes();
+		saveGuesses();
+		savePlayers();
 		strikes = 0;
 		System.out.println("Welcome to level " + level);
 		number = getNumber(level);
@@ -44,6 +56,9 @@ public class NumberGuesserPart4 {
 		}
 		saveLevel();
 		number = getNumber(level);
+		saveStrikes();
+		saveGuesses();
+		savePlayers();
 	}
 
 	private void processCommands(String message) {
@@ -120,6 +135,89 @@ public class NumberGuesserPart4 {
 		return level > 1;
 	}
 
+	private void saveStrikes() {
+		try (FileWriter fw = new FileWriter(saveFile)) {
+			fw.write("" + strikes);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean loadStrikes() {
+		File file = new File(saveFile);
+		if (!file.exists()) {
+			return false;
+		}
+		try (Scanner reader = new Scanner(file)) {
+			while (reader.hasNextLine()) {
+				int _strikes = reader.nextInt();
+				if (_strikes > 5) {
+					strikes = _strikes;
+					break;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		} catch (Exception e2) {
+			e2.printStackTrace();
+			return false;
+		}
+		return strikes > 5;
+	}
+
+	private void saveGuesses() {
+		try (FileWriter fw = new FileWriter(saveFile)) {
+			fw.write("" + guesses);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean loadGuesses() {
+		File file = new File(saveFile);
+		if (!file.exists()) {
+			return false;
+		}
+		try (Scanner reader = new Scanner(file)) {
+			while (reader.hasNextLine()) {
+				int _guesses = reader.nextInt();
+				if (_guesses > 5) {
+					guesses[].append(_guesses);
+					break;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		} catch (Exception e2) {
+			e2.printStackTrace();
+			return false;
+		}	
+	}
+
+	private void savePlayers() {
+		try (FileWriter fw = new FileWriter(saveFile)) {
+			fw.write("" + playerName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private boolean loadPlayers() {
+		File file = new File(saveFile);
+		if (!file.exists()) {
+			return false;
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		} catch (Exception e2) {
+			e2.printStackTrace();
+			return false;
+		}
+	}
+
 	void run() {
 		try (Scanner input = new Scanner(System.in);) {
 			System.out.println("Welcome to Number Guesser 4.0!");
@@ -147,7 +245,7 @@ public class NumberGuesserPart4 {
 	}
 
 	public static void main(String[] args) {
-		NumberGuesserPart4 guesser = new NumberGuesserPart4();
+		NumberGuesserHW guesser = new NumberGuesserHW();
 		guesser.run();
 	}
 }
