@@ -28,8 +28,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 
-import org.w3c.dom.events.Event;
-
 public class ClientUI extends JFrame implements Event {
 	/**
 	 * 
@@ -256,7 +254,7 @@ public class ClientUI extends JFrame implements Event {
 	public void onClientConnect(String clientName, String message) {
 		log.log(Level.INFO, String.format("%s: %s", clientName, message));
 		addClient(clientName);
-		if (message != null && !message.isBlank()) {
+		if (message != null && !message.isEmpty()) {
 			self.addMessage(String.format("%s: %s", clientName, message));
 		}
 	}

@@ -8,8 +8,8 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import Server.PayloadType;
 import server.Payload;
+import server.PayloadType;
 
 //part 7
 public class SocketClient {
