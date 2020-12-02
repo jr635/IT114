@@ -211,9 +211,53 @@ public class ClientUI extends JFrame implements Event {
 	}
 
 	void addMessage(String str) {
+		
 		JEditorPane entry = new JEditorPane();
 		entry.setEditable(false);
 		// entry.setLayout(null);
+		entry.setContentType("text/html");	
+		int bcount = 0;
+		for (int i = 0; i < str.length(); i++) {
+			if(str.charAt(i) == '*') {
+				bcount++;
+			}
+		}
+		if(bcount >= 2) {
+			str = str.replace("*", "<b>");
+			}
+		str = str.replace("<b> ", "</b>");
+		
+		int ucount = 0;
+		for (int i = 0; i < str.length(); i++) {
+			if(str.charAt(i) == '_') {
+				ucount++;
+			}
+		}
+		if(ucount >= 2) {
+			str = str.replace("_", "<u>");
+			}
+		str = str.replace("<u> ", "</u>");
+		int icount = 0;
+		for (int i = 0; i < str.length(); i++) {
+			if(str.charAt(i) == '-') {
+				icount++;
+			}
+		}
+		if(icount >= 2) {
+			str = str.replace("-", "<i>");
+			}
+		str = str.replace("<i> ", "</i>");
+		int gcount = 0;
+		for (int i = 0; i < str.length(); i++) {
+			if(str.charAt(i) == '$') {
+				gcount++;
+			}
+		}
+		if(gcount >= 2) {
+			str = str.replace("$", "<font color = green>");
+			}
+		str = str.replace("<font color = green> ", "</font>");
+		System.out.println(str);
 		entry.setText(str);
 		Dimension d = new Dimension(textArea.getSize().width, calcHeightForText(str));
 		// attempt to lock all dimensions

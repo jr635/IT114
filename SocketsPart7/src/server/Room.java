@@ -15,6 +15,8 @@ public class Room implements AutoCloseable {
 	private final static String COMMAND_TRIGGER = "/";
 	private final static String CREATE_ROOM = "createroom";
 	private final static String JOIN_ROOM = "joinroom";
+	private final static String ROLL = "roll";
+	private final static String FLIP = "flip";
 
 	public Room(String name) {
 		this.name = name;
@@ -85,6 +87,13 @@ public class Room implements AutoCloseable {
 	protected void joinLobby(ServerThread client) {
 		server.joinLobby(client);
 	}
+	
+	 protected void createRoom(String room, ServerThread client) {
+			if (server.createNewRoom(room)) {
+			    sendMessage(client, "Created a new room");
+			    joinRoom(room, client);
+			}
+		    }
 
 	/***
 	 * Helper function to process messages to trigger different functionality.
@@ -93,39 +102,56 @@ public class Room implements AutoCloseable {
 	 * @param client  The sender of the message (since they'll be the ones
 	 *                triggering the actions)
 	 */
-	private boolean processCommands(String message, ServerThread client) {
-		boolean wasCommand = false;
-		try {
-			if (message.indexOf(COMMAND_TRIGGER) > -1) {
-				String[] comm = message.split(COMMAND_TRIGGER);
-				log.log(Level.INFO, message);
-				String part1 = comm[1];
-				String[] comm2 = part1.split(" ");
-				String command = comm2[0];
-				if (command != null) {
-					command = command.toLowerCase();
-				}
-				String roomName;
-				switch (command) {
-				case CREATE_ROOM:
-					roomName = comm2[1];
-					if (server.createNewRoom(roomName)) {
-						joinRoom(roomName, client);
-					}
-					wasCommand = true;
-					break;
-				case JOIN_ROOM:
-					roomName = comm2[1];
-					joinRoom(roomName, client);
-					wasCommand = true;
-					break;
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+    private String processCommands(String message, ServerThread client) {
+	String response = null;
+	try {
+	    if (message.indexOf(COMMAND_TRIGGER) > -1) {
+		String[] comm = message.split(COMMAND_TRIGGER);
+		log.log(Level.INFO, message);
+		String part1 = comm[1];
+		String[] comm2 = part1.split(" ");
+		String command = comm2[0];
+		if (command != null) {
+		    command = command.toLowerCase();
 		}
-		return wasCommand;
+		String roomName;
+		switch (command) {
+		case CREATE_ROOM:
+		    roomName = comm2[1];
+		    createRoom(roomName, client);
+		    break;
+		case JOIN_ROOM:
+		    roomName = comm2[1];
+		    joinRoom(roomName, client);
+		    break;
+		case ROLL:
+			response = "You rolled a : " + ((int)(Math.random()*6) + 1);
+			break;
+		case FLIP:
+			String face = "";
+			int flipface = (int)(Math.random()*0) + 1;
+			if(flipface == 1)
+				face = "Heads";
+			else
+				face = "Tails";
+			response = ("You flipped a coin and got : " + face);
+			break;
+		default:
+		    // not a command, let's fix this function from eating messages
+		    response = message;
+		    break;
+		}
+	    }
+	    else {
+		// not a command, let's fix this function from eating messages
+		response = message;
+	    }
 	}
+	catch (Exception e) {
+	    e.printStackTrace();
+	}
+	return response;
+    }
 
 	// TODO changed from string to ServerThread
 	protected void sendConnectionStatus(ServerThread client, boolean isConnect, String message) {
@@ -150,10 +176,13 @@ public class Room implements AutoCloseable {
 	 */
 	protected void sendMessage(ServerThread sender, String message) {
 		log.log(Level.INFO, getName() + ": Sending message to " + clients.size() + " clients");
-		if (processCommands(message, sender)) {
+		String resp = processCommands(message, sender);
+		if (resp == null) {
 			// it was a command, don't broadcast
 			return;
 		}
+		message = resp;
+		System.out.println(message);
 		Iterator<ServerThread> iter = clients.iterator();
 		while (iter.hasNext()) {
 			ServerThread client = iter.next();
