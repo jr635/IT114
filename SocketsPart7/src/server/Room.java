@@ -17,6 +17,8 @@ public class Room implements AutoCloseable {
 	private final static String JOIN_ROOM = "joinroom";
 	private final static String ROLL = "roll";
 	private final static String FLIP = "flip";
+	private final static String UNMUTE = "unmute";
+	private final static String MUTE = "mute";
 
 	public Room(String name) {
 		this.name = name;
@@ -125,16 +127,25 @@ public class Room implements AutoCloseable {
 		    joinRoom(roomName, client);
 		    break;
 		case ROLL:
-			response = "You rolled a : " + ((int)(Math.random()*6) + 1);
+			int rollnumber = ((int)(Math.random()*6) + 1);
+			response = "*You rolled a :* " + " *" + rollnumber + "</b>";
+			break;
+		case MUTE:
+			String clientname;
+			client.addMute();
+			break;
+		case UNMUTE:
+			String clientName;
+			client.removeMute();
 			break;
 		case FLIP:
 			String face = "";
 			int flipface = (int)(Math.random()*0) + 1;
 			if(flipface == 1)
-				face = "Heads";
+				face = "*Heads*";
 			else
-				face = "Tails";
-			response = ("You flipped a coin and got : " + face);
+				face = "*Tails*";
+			response = ("*You flipped a coin and got : *" + face);
 			break;
 		default:
 		    // not a command, let's fix this function from eating messages
@@ -144,13 +155,23 @@ public class Room implements AutoCloseable {
 	    }
 	    else {
 		// not a command, let's fix this function from eating messages
-		response = message;
+	    //List<String> users;
+	    //sendPrivateMessage(client,message, users);
+		//response = message;
 	    }
 	}
 	catch (Exception e) {
 	    e.printStackTrace();
 	}
 	return response;
+    }
+    
+    protected void sendPrivateMessage(ServerThread sender, String message, List<String> users) {
+    	log.log(Level.INFO, getName() + ": Sending a private message to " + clients.size() + " clients");
+    	String resp = processCommands(message,sender);
+    	if (resp == null) {
+    		return;
+    	}
     }
 
 	// TODO changed from string to ServerThread
@@ -186,10 +207,12 @@ public class Room implements AutoCloseable {
 		Iterator<ServerThread> iter = clients.iterator();
 		while (iter.hasNext()) {
 			ServerThread client = iter.next();
-			boolean messageSent = client.send(sender.getClientName(), message);
-			if (!messageSent) {
-				iter.remove();
-				log.log(Level.INFO, "Removed client " + client.getId());
+			if(!client.isMuted(sender.getClientName())) {
+				boolean messageSent = client.send(sender.getClientName(), message);
+				if (!messageSent) {
+					iter.remove();
+					log.log(Level.INFO, "Removed client " + client.getId());
+				}
 			}
 		}
 	}
