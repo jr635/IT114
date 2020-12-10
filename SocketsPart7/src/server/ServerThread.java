@@ -31,12 +31,19 @@ public class ServerThread extends Thread {
 		return currentRoom;
 	}
 	
-	public void addMute() {
-		mutedClients.add(clientName);
+	public void addMute(String name) {
+		name = name.trim().toLowerCase();
+		if(!isMuted(name)) {
+			mutedClients.add(name);
+		}
 	}
 	
-	public void removeMute() {
-		mutedClients.remove(clientName);
+	public void removeMute(String name) {
+		name = name.trim().toLowerCase();
+		if(isMuted(name)) {
+			mutedClients.remove(name);
+		}
+		
 	}
 
 	protected synchronized void setCurrentRoom(Room room) {

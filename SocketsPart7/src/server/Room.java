@@ -19,7 +19,6 @@ public class Room implements AutoCloseable {
 	private final static String FLIP = "flip";
 	private final static String UNMUTE = "unmute";
 	private final static String MUTE = "mute";
-	List<String> mutedClients = new ArrayList<String>();
 
 	public Room(String name) {
 		this.name = name;
@@ -132,16 +131,15 @@ public class Room implements AutoCloseable {
 			response = "*You rolled a :* " + " *" + rollnumber + "</b>";
 			break;
 		case MUTE:
-			String clientname;
-			for(int i = 0; i < mutedClients.size(); i++) {
-				client.addMute();
+			for(ServerThread user : clients) {
+				client.addMute(user.getClientName());
 			}
 			break;
 		case UNMUTE:
-			String clientName;
-			for(int i = 0; i < mutedClients.size(); i++) {
-				client.removeMute();
+			for(ServerThread user : clients) {		
+				client.removeMute(user.getClientName());	
 			}
+
 			break;
 		case FLIP:
 			String face = "";
