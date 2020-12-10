@@ -19,6 +19,7 @@ public class Room implements AutoCloseable {
 	private final static String FLIP = "flip";
 	private final static String UNMUTE = "unmute";
 	private final static String MUTE = "mute";
+	List<String> mutedClients = new ArrayList<String>();
 
 	public Room(String name) {
 		this.name = name;
@@ -132,11 +133,15 @@ public class Room implements AutoCloseable {
 			break;
 		case MUTE:
 			String clientname;
-			client.addMute();
+			for(int i = 0; i < mutedClients.size(); i++) {
+				client.addMute();
+			}
 			break;
 		case UNMUTE:
 			String clientName;
-			client.removeMute();
+			for(int i = 0; i < mutedClients.size(); i++) {
+				client.removeMute();
+			}
 			break;
 		case FLIP:
 			String face = "";
@@ -157,7 +162,7 @@ public class Room implements AutoCloseable {
 		// not a command, let's fix this function from eating messages
 	    //List<String> users;
 	    //sendPrivateMessage(client,message, users);
-		//response = message;
+		response = message;
 	    }
 	}
 	catch (Exception e) {
