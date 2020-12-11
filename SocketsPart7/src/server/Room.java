@@ -150,6 +150,8 @@ public class Room implements AutoCloseable {
 			for(ServerThread user : clients) {
 				if(message.contains(user.getClientName())) {
 					pmClients.add(user.getClientName());
+					message = message.replace("/pm","");
+					message = message.replace(user.getClientName(), "");
 				}
 			}
 			sendPrivateMessage(client,message,pmClients);
