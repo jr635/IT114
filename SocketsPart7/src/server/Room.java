@@ -146,11 +146,14 @@ public class Room implements AutoCloseable {
 			}
 			break;
 		case PM:
+			List<String> pmClients = new ArrayList<String>();
 			for(ServerThread user : clients) {
 				if(message.contains(user.getClientName())) {
-					client.sendPrivateMessage(user.getClientName());
+					pmClients.add(user.getClientName());
 				}
 			}
+			sendPrivateMessage(client,message,pmClients);
+			break;
 		case FLIP:
 			String face = "";
 			int flipface = (int)(Math.random()*0) + 1;
@@ -168,8 +171,8 @@ public class Room implements AutoCloseable {
 	    }
 	    else {
 		// not a command, let's fix this function from eating messages
-	    List<String> users;
-	    sendPrivateMessage(client,message, users);
+	    //List<String> users;
+	    //sendPrivateMessage(client,message, users);
 		response = message;
 	    }
 	}
@@ -180,12 +183,26 @@ public class Room implements AutoCloseable {
     }
     
     protected void sendPrivateMessage(ServerThread sender, String message, List<String> users) {
-    	log.log(Level.INFO, getName() + ": Sending a private message to " + clients.size() + " clients");
-    	String resp = processCommands(message,sender);
-    	if (resp == null) {
-    		return;
+    	Iterator<ServerThread> iter = clients.iterator();
+    	while(iter.hasNext()) {
+    		ServerThread client = iter.next();
+    		if(users.contains(client.getClientName().toLowerCase())) {
+    			boolean messageSent = client.send(sender.getClientName(), message);
+    			if(!messageSent) {
+    				iter.remove();
+    			}
+    			break;
+    		}
     	}
     }
+    
+    //protected void sendPrivateMessage(ServerThread sender, String message, List<String> users) {
+    	//log.log(Level.INFO, getName() + ": Sending a private message to " + clients.size() + " clients");
+    	//String resp = processCommands(message,sender);
+    //	if (resp == null) {
+    		//return;
+    	//}
+    //}
 
 	// TODO changed from string to ServerThread
 	protected void sendConnectionStatus(ServerThread client, boolean isConnect, String message) {
