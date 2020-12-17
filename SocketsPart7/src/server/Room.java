@@ -135,6 +135,8 @@ public class Room implements AutoCloseable {
 			for(ServerThread user : clients) {
 				if(message.contains(user.getClientName())) {
 					client.addMute(user.getClientName());
+					message = " muted you";
+					user.send(client.getClientName(),message);
 				}
 			}
 			break;
@@ -142,6 +144,8 @@ public class Room implements AutoCloseable {
 			for(ServerThread user : clients) {	
 				if(message.contains(user.getClientName())) {
 				client.removeMute(user.getClientName());	
+				message = client + " unmuted you";
+				user.send(client.getClientName(),message);
 				}
 			}
 			break;
@@ -197,14 +201,6 @@ public class Room implements AutoCloseable {
     		}
     	}
     }
-    
-    //protected void sendPrivateMessage(ServerThread sender, String message, List<String> users) {
-    	//log.log(Level.INFO, getName() + ": Sending a private message to " + clients.size() + " clients");
-    	//String resp = processCommands(message,sender);
-    //	if (resp == null) {
-    		//return;
-    	//}
-    //}
 
 	// TODO changed from string to ServerThread
 	protected void sendConnectionStatus(ServerThread client, boolean isConnect, String message) {

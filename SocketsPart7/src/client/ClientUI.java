@@ -170,6 +170,18 @@ public class ClientUI extends JFrame implements Event {
 		textArea.getParent().getParent().getParent().add(scroll, BorderLayout.EAST);
 	}
 
+	void ChatExport() {
+		StringBuilder sb = new StringBuilder();
+		Component[] comps = textArea.getComponents();
+		for(Component c : comps) {
+		JEditorPane j = (JEditorPane)c;
+		if(j != null) {
+				sb.append(j.getText() + System.lineSeparator());
+			}
+		}
+		sb.toString();
+	}
+	
 	void addClient(String name) {
 		User u = new User(name);
 		Dimension p = new Dimension(userPanel.getSize().width, 30);
